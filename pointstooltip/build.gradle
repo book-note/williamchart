@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.Merpyzf'
 
 android {
     compileSdkVersion rootProject.targetSdkVersion
@@ -23,5 +25,3 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion"
     implementation project(path: ':williamchart')
 }
-
-apply from: 'publish.gradle'
