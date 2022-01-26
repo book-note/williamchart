@@ -3,26 +3,15 @@ package com.db.williamchart.renderer
 import com.db.williamchart.ChartContract
 import com.db.williamchart.Painter
 import com.db.williamchart.animation.ChartAnimation
+import com.db.williamchart.data.*
 import com.db.williamchart.data.configuration.BarChartConfiguration
 import com.db.williamchart.data.configuration.ChartConfiguration
-import com.db.williamchart.data.DataPoint
-import com.db.williamchart.data.Frame
-import com.db.williamchart.data.Label
-import com.db.williamchart.data.notInitialized
-import com.db.williamchart.data.shouldDisplayAxisX
-import com.db.williamchart.data.shouldDisplayAxisY
 import com.db.williamchart.data.configuration.toOuterFrame
-import com.db.williamchart.data.contains
-import com.db.williamchart.data.withPaddings
 import com.db.williamchart.extensions.maxValueBy
 import com.db.williamchart.extensions.toBarScale
 import com.db.williamchart.extensions.toDataPoints
 import com.db.williamchart.extensions.toLabels
-import com.db.williamchart.renderer.executor.DebugWithLabelsFrame
-import com.db.williamchart.renderer.executor.DefineVerticalBarsClickableFrames
-import com.db.williamchart.renderer.executor.GetVerticalBarBackgroundFrames
-import com.db.williamchart.renderer.executor.GetVerticalBarFrames
-import com.db.williamchart.renderer.executor.MeasureBarChartPaddings
+import com.db.williamchart.renderer.executor.*
 
 class BarChartRenderer(
     private val view: ChartContract.BarView,
@@ -139,18 +128,18 @@ class BarChartRenderer(
         if (RendererConstants.inDebug) {
             view.drawDebugFrame(
                 listOf(outerFrame, innerFrame) +
-                    DebugWithLabelsFrame()(
-                        painter = painter,
-                        axisType = chartConfiguration.axis,
-                        xLabels = xLabels,
-                        yLabels = yLabels,
-                        labelsSize = chartConfiguration.labelsSize
-                    ) +
-                    DefineVerticalBarsClickableFrames()(
-                        innerFrame,
-                        data.map { Pair(it.screenPositionX, it.screenPositionY) }
-                    ) +
-                    Frame(innerFrame.left, zeroPositionY, innerFrame.right, zeroPositionY)
+                        DebugWithLabelsFrame()(
+                            painter = painter,
+                            axisType = chartConfiguration.axis,
+                            xLabels = xLabels,
+                            yLabels = yLabels,
+                            labelsSize = chartConfiguration.labelsSize
+                        ) +
+                        DefineVerticalBarsClickableFrames()(
+                            innerFrame,
+                            data.map { Pair(it.screenPositionX, it.screenPositionY) }
+                        ) +
+                        Frame(innerFrame.left, zeroPositionY, innerFrame.right, zeroPositionY)
             )
         }
     }
@@ -193,8 +182,8 @@ class BarChartRenderer(
         val widthBetweenLabels = (labelsRightPosition - labelsLeftPosition) / (xLabels.size - 1)
         val xLabelsVerticalPosition =
             innerFrame.bottom -
-                painter.measureLabelAscent(chartConfiguration.labelsSize) +
-                RendererConstants.labelsPaddingToInnerChart
+                    painter.measureLabelAscent(chartConfiguration.labelsSize) +
+                    RendererConstants.labelsPaddingToInnerChart
 
         xLabels.forEachIndexed { index, label ->
             label.screenPositionX = labelsLeftPosition + (widthBetweenLabels * index)
@@ -203,17 +192,18 @@ class BarChartRenderer(
     }
 
     private fun placeLabelsY(innerFrame: Frame) {
-
+        val halfBarWidth = (innerFrame.right - innerFrame.left) / xLabels.size / 2
+        val yOffset = halfBarWidth * 2 - chartConfiguration.barsSpacing
         val heightBetweenLabels =
             (innerFrame.bottom - innerFrame.top) / RendererConstants.defaultScaleNumberOfSteps
         val labelsBottomPosition =
-            innerFrame.bottom + painter.measureLabelHeight(chartConfiguration.labelsSize) / 2
+            innerFrame.bottom + painter.measureLabelHeight(chartConfiguration.labelsSize) / 2 - yOffset
 
         yLabels.forEachIndexed { index, label ->
             label.screenPositionX =
                 innerFrame.left -
-                    RendererConstants.labelsPaddingToInnerChart -
-                    painter.measureLabelWidth(label.label, chartConfiguration.labelsSize) / 2
+                        RendererConstants.labelsPaddingToInnerChart -
+                        painter.measureLabelWidth(label.label, chartConfiguration.labelsSize) / 2
             label.screenPositionY = labelsBottomPosition - heightBetweenLabels * index
         }
     }
@@ -234,12 +224,12 @@ class BarChartRenderer(
         val labelsLeftPosition = innerFrame.left + halfBarWidth
         val labelsRightPosition = innerFrame.right - halfBarWidth
         val widthBetweenLabels = (labelsRightPosition - labelsLeftPosition) / (xLabels.size - 1)
-
+        val yOffset = halfBarWidth * 2 - chartConfiguration.barsSpacing
         data.forEachIndexed { index, dataPoint ->
             dataPoint.screenPositionX = labelsLeftPosition + (widthBetweenLabels * index)
             dataPoint.screenPositionY =
                 if (dataPoint.value >= 0f)
-                    zeroPositionY - (positiveHeight * dataPoint.value / positiveScale) // Positive
+                    (zeroPositionY - yOffset) - ((positiveHeight - yOffset) * dataPoint.value / positiveScale) // Positive
                 else zeroPositionY + (negativeHeight * dataPoint.value / negativeScale) // Negative
         }
     }

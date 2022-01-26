@@ -46,6 +46,7 @@ class DemoFragment : Fragment() {
          * Bar Chart
          */
         barChart.animation.duration = animationDuration
+        barChart.barsColorsList = getColors(barSet)
         barChart.animate(barSet)
 
         /**
@@ -66,6 +67,16 @@ class DemoFragment : Fragment() {
         horizontalBarChart.animate(horizontalBarSet)
     }
 
+    private fun getColors(barSet: List<Pair<String, Float>>): List<Int>{
+        return barSet.map {
+            if (it.second.toInt() == 0){
+                Color.YELLOW
+            }else{
+                Color.WHITE
+            }
+        }
+    }
+
     companion object {
         private val lineSet = listOf(
             "label1" to 5f,
@@ -82,13 +93,22 @@ class DemoFragment : Fragment() {
             "label12" to 4f
         )
 
+//        private val barSet = listOf(
+//            "JAN" to 30F,
+//            "FEB" to 7F,
+//            "MAR" to 2F,
+//            "MAY" to 2.3F,
+//            "APR" to 5F,
+//            "JUN" to 4F
+//        )
+
         private val barSet = listOf(
-            "JAN" to 4F,
-            "FEB" to 7F,
-            "MAR" to 2F,
-            "MAY" to 2.3F,
-            "APR" to 5F,
-            "JUN" to 4F
+            "JAN" to 10000F,
+            "FEB" to 3000.0F,
+            "MAR" to 4000.0F,
+            "MAY" to 0.0F,
+            "APR" to 0.0F,
+            "JUN" to 800.0F
         )
 
         private val horizontalBarSet = listOf(
