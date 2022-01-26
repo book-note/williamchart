@@ -6,7 +6,6 @@ release-play: # Make sure to update the release version before releasing
 
 check:
 	./gradlew lint
-	./gradlew detekt
 
 test:
 	./gradlew test

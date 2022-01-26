@@ -21,7 +21,6 @@ buildscript {
 }
 
 plugins {
-    id "io.gitlab.arturbosch.detekt" version "1.0.0"
     id "com.vanniktech.android.junit.jacoco" version "0.15.0"
 }
 
@@ -32,7 +31,6 @@ allprojects {
         google()
     }
     apply from: "$rootDir/ktlint.gradle"
-    apply from: "$rootDir/detekt.gradle"
     apply from: "$rootDir/jacoco.gradle"
 }
 
