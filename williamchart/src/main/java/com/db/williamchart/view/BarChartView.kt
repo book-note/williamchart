@@ -5,18 +5,15 @@ import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import androidx.annotation.ColorInt
 import com.db.williamchart.ChartContract
 import com.db.williamchart.ExperimentalFeature
 import com.db.williamchart.R
 import com.db.williamchart.animation.NoAnimation
+import com.db.williamchart.data.*
 import com.db.williamchart.data.configuration.BarChartConfiguration
 import com.db.williamchart.data.configuration.ChartConfiguration
-import com.db.williamchart.data.Frame
-import com.db.williamchart.data.Label
-import com.db.williamchart.data.Paddings
-import com.db.williamchart.data.toRect
-import com.db.williamchart.data.toRectF
 import com.db.williamchart.extensions.drawChartBar
 import com.db.williamchart.extensions.obtainStyledAttributes
 import com.db.williamchart.renderer.BarChartRenderer
@@ -79,9 +76,10 @@ class BarChartView @JvmOverloads constructor(
 
         frames.forEachIndexed { index, frame ->
             painter.prepare(color = barsColorsList!![index], style = Paint.Style.FILL)
+            val r = getNewBarRadius(barRadius, frame.toRect().width())
             canvas.drawChartBar(
                 frame.toRectF(),
-                barRadius,
+                r,
                 painter.paint
             )
         }
@@ -90,11 +88,20 @@ class BarChartView @JvmOverloads constructor(
     override fun drawBarsBackground(frames: List<Frame>) {
         painter.prepare(color = barsBackgroundColor, style = Paint.Style.FILL)
         frames.forEach {
+            val r = getNewBarRadius(barRadius, it.toRect().width())
             canvas.drawChartBar(
                 it.toRectF(),
-                barRadius,
+                r,
                 painter.paint
             )
+        }
+    }
+
+    private fun getNewBarRadius(barRadius: Float, barWidth: Int): Float {
+        return if (barRadius < 0.01) {
+            barWidth / 2f
+        } else {
+            barRadius
         }
     }
 
