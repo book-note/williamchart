@@ -15,6 +15,7 @@ class Painter(
 
     init {
         paint.textAlign = Paint.Align.CENTER
+        paint.isAntiAlias = true
     }
 
     /**
